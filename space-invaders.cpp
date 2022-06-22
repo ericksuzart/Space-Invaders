@@ -1,5 +1,7 @@
+#include <Arduino.h>
 // #include <LiquidCrystal.h>
-#include <Adafruit_LiquidCrystal.h> // I2C display library
+// #include <Adafruit_LiquidCrystal.h> // I2C display library
+#include "Adafruit_LiquidCrystal/Adafruit_LiquidCrystal.h"
 
 Adafruit_LiquidCrystal lcd(0);
 
