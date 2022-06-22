@@ -1,9 +1,9 @@
-#include <Arduino.h>
+// #include <Arduino.h>
 // #include <LiquidCrystal.h>
-// #include <Adafruit_LiquidCrystal.h> // I2C display library
-#include "Adafruit_LiquidCrystal/Adafruit_LiquidCrystal.h"
+#include <LiquidCrystal.h>
 
-Adafruit_LiquidCrystal lcd(0);
+const int rs = 13, enable = 12, d4 = 11, d5 = 10, d6 = 9, d7 = 8;
+LiquidCrystal lcd(rs, enable, d4, d5, d6, d7);
 
 // the pins used by the LCD panel
 // LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
@@ -282,9 +282,10 @@ class Alien: public GameObject
 byte buttonPressed()
 {
   int adc_key_in = analogRead(A0);      // read analogue value
-  if (adc_key_in <= 350)  return btnLEFT;
-  if (adc_key_in <= 550)  return btnRIGHT;
-  if (adc_key_in <= 700)  return btnFIRE;
+  Serial.println(adc_key_in);
+  if (adc_key_in <= 20)  return btnLEFT;
+  if (adc_key_in <= 100)  return btnRIGHT;
+  if (adc_key_in <= 200)  return btnFIRE;
 
   return btnNONE;
 }
@@ -465,14 +466,17 @@ void loop()
   {
     case btnRIGHT: {
       ship.moveRight();
+      Serial.println("Right");
       break;
     }
     case btnLEFT:{
       ship.moveLeft();
+      Serial.println("Left");
       break;
     }
     // Shoot
     case btnFIRE:{
+      Serial.println("FIRE");
       if(!shipBullet.active()){
         // TODO: add shoot sound
         shipBullet.setX(ship.x());
@@ -483,6 +487,7 @@ void loop()
       break;
     }
     default:
+      Serial.println("NONE");
       break;
   }
 

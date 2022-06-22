@@ -135,6 +135,18 @@ byte alien1_2_bullet_sprite[] = {
   B00000
 };
 
+typedef struct
+{
+  int8_t _x;
+  int8_t _y;
+  int8_t _speed;
+
+  void (* G_OBJ_Construct)(GameObject*, int8_t, int8_t, int8_t);
+  int8_t (* G_OBJ_getX)(GameObject*);
+  int8_t (* G_OBJ_getY)(GameObject*);
+  int8_t (* G_OBJ_getS)(GameObject*);
+
+} GameObject;
 
 // Base class for game objects
 class GameObject {
