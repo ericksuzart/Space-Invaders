@@ -693,7 +693,7 @@ void playLoseSound()
   tone(buzzerPin, 466.164, 100);
   delay(80);
 
-  for(double wah=0; wah < 5; wah += 4.939)
+  for(double wah = 0; wah < 5; wah += 4.939)
   {
     tone(buzzerPin, 415.305 + wah, 50);
     delay(30);
@@ -702,7 +702,7 @@ void playLoseSound()
   tone(buzzerPin, 440.000, 100);
   delay(80);
 
-  for(double wah=0; wah < 5; wah += 4.662)
+  for(double wah = 0; wah < 5; wah += 4.662)
   {
     tone(buzzerPin, 391.995 + wah, 50);
     delay(30);
@@ -711,7 +711,7 @@ void playLoseSound()
   tone(buzzerPin, 415.305, 100);
   delay(80);
 
-  for(int j=0; j<7; j++)
+  for(int j = 0; j < 7; j++)
   {
     tone(buzzerPin, 391.995, 70);
     tone(buzzerPin, 415.305, 70);
@@ -751,7 +751,7 @@ void shipActions()
     shipBullet.setY(ship.y());
     shipBullet.setSpeed(-1);
     shipBullet.setActive(true);
-    tone(buzzerPin, 400,75);//play laser sound
+    tone(buzzerPin, 400,75); // play laser sound
   }
 
   // Move the ship
