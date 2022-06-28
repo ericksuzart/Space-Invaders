@@ -1,6 +1,0 @@
-{
-  "files.associations": {
-    "*.dae": "3dformat",
-    "cstddef": "cpp"
-  }
-}

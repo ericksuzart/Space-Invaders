@@ -1,13 +1,16 @@
 /**
  * @file Space-InvadersI2C.cpp
  * @author Erick Suzart Souza (ericksuzart@gmail.com)
- * @brief 
+ * @brief Minimal implementation of Space Invaders game using Arduino platform.
  * @version 0.1
  * @date 25-06-2022
  * 
  * @copyright Copyright (c) 2022
  * 
  */
+
+#include <Arduino.h>
+#include <Wire.h>
 
 #include <LiquidCrystal.h>
 
@@ -18,7 +21,9 @@ LiquidCrystal lcd(13, 12, 11, 10, 9, 8, 7, 6, 5, 4);
 #define btnNONE   0
 #define btnLEFT   1
 #define btnRIGHT  2
-volatile int adc_key_in = 0; // initialize to no button pressed
+int adc_key_in = 0; // initialize to no button pressed
+
+#define buzzerPin 3
 
 #define WIDTH   16
 #define HEIGHT   4
@@ -33,7 +38,7 @@ volatile int adc_key_in = 0; // initialize to no button pressed
 #define ALIEN1BULLET  6
 #define ALIEN2BULLET  7
 
-#define GAME_STEP   250 // Delay (ms) between game steps
+#define GAME_STEP   200 // Delay (ms) between game steps
 #define ALIENS_NUM    8 // Number of aliens
 
 byte animationStep; // Number of game step
@@ -228,6 +233,7 @@ public:
     return true;
   }
 } GameObject;
+
 
 /**
  * @brief Class for game bullets, inherited from GameObject
@@ -454,11 +460,22 @@ void drawShipBullet(bool& shipDisplayed)
  */
 void drawAliens()
 {
-  for (byte i = 0; i < ALIENS_NUM; i++) // for each alien
+  // for each alien
+  for (byte i = 0; i < ALIENS_NUM; i++)
+  {
     // if alien is alive draw it on the screenBuffer with correct model in
     // function of its state
     if(aliens[i].alive())
       screenBuffer[aliens[i].y() / 2][aliens[i].x()] = (aliens[i].state())? ALIEN1 : ALIEN2;
+
+    if ((alienColide(i)) &&
+      (shipBullet.active()) &&
+      (aliens[i].alive()))
+    {
+      screenBuffer[aliens[i].y() / 2][aliens[i].x()] = '*';
+      aliens[i].setAlive(false);
+    }
+  }
 }
 
 
@@ -514,34 +531,70 @@ void drawAlienBullets(bool& bulletDisplayed, bool& shipDisplayed)
  * lcd.print() processes it like EOL
  *
  */
-void updateScreen(){
-  bool shipDisplayed = false; //shows whether ship have been displayed with SHIP_BULLET sprite
+void updateScreen()
+{
+  // shows whether ship have been displayed with SHIP_BULLET sprite
+  bool shipDisplayed = false;
   bool bulletDisplayed = false;
 
   clearBuffer();
 
-  //Drawing ship's bullet
+  // Drawing ship's bullet
   drawShipBullet(shipDisplayed);
 
-  //Drawing aliens
+  // Drawing aliens
   drawAliens();
 
-  //Drawing aliens and bullets
+  // Drawing aliens and bullets
   drawAlienBullets(bulletDisplayed, shipDisplayed);
 
-  //Sending the buffer to the screen
+  // Sending the buffer to the screen
   for (byte i = 0; i < HEIGHT/2; i++)
   {
     lcd.setCursor(0,i);
     lcd.print(screenBuffer[i]);
   }
 
-  //After all, displaying the ship if not displayed yet
+  // After all, displaying the ship if not displayed yet
   if (!shipDisplayed)
   {
     lcd.setCursor(ship.x(), ship.y()/2);
     lcd.write(byte(SHIP));
   }
+}
+
+
+/**
+ * @brief Play a sound of new level
+ * 
+ */
+void playLevelSound()
+{
+  tone(buzzerPin, 880, 100); //A5
+  delay(50);
+  tone(buzzerPin, 988, 100); //B5
+  delay(50);
+  tone(buzzerPin, 523, 100); //C5
+  delay(50);
+  tone(buzzerPin, 988, 100); //B5
+  delay(50);
+  tone(buzzerPin, 523, 100); //C5
+  delay(50);
+  tone(buzzerPin, 587, 100); //D5
+  delay(50);
+  tone(buzzerPin, 523, 100); //C5
+  delay(50);
+  tone(buzzerPin, 587, 100); //D5
+  delay(50);
+  tone(buzzerPin, 659, 100); //E5
+  delay(50);
+  tone(buzzerPin, 587, 100); //D5
+  delay(50);
+  tone(buzzerPin, 659, 100); //E5
+  delay(50);
+  tone(buzzerPin, 659, 100); //E5
+  delay(50);
+  delay(250);
 }
 
 
@@ -554,7 +607,7 @@ void initLevel(byte l)
 {
   level = l;
 
-  if (level>42)//Easter egg: 42 is the ultimate level :)
+  if (level>42) // Easter egg: 42 is the ultimate level :)
     level = 42;
 
   //Reset ship object
@@ -594,8 +647,52 @@ void initLevel(byte l)
   lcd.print("Level ");
   lcd.setCursor(8,0);
   lcd.print(level);
+  playLevelSound();
   delay(1000);
   lcd.clear();
+}
+
+/**
+ * @brief Play lose sound music
+ * 
+ */
+void playLoseSound()
+{
+  delay(400);
+  //wah wah wah wahwahwahwahwahwah
+  for(double wah = 0; wah < 4; wah += 6.541)
+  {
+    tone(buzzerPin, 440 + wah, 50);
+    delay(30);
+  }
+
+  tone(buzzerPin, 466.164, 100);
+  delay(80);
+
+  for(double wah=0; wah < 5; wah += 4.939)
+  {
+    tone(buzzerPin, 415.305 + wah, 50);
+    delay(30);
+  }
+
+  tone(buzzerPin, 440.000, 100);
+  delay(80);
+
+  for(double wah=0; wah < 5; wah += 4.662)
+  {
+    tone(buzzerPin, 391.995 + wah, 50);
+    delay(30);
+  }
+
+  tone(buzzerPin, 415.305, 100);
+  delay(80);
+
+  for(int j=0; j<7; j++)
+  {
+    tone(buzzerPin, 391.995, 70);
+    tone(buzzerPin, 415.305, 70);
+  }
+  delay(400);
 }
 
 
@@ -605,67 +702,58 @@ void initLevel(byte l)
  */
 void gameOver()
 {
+  lcd.clear();
   lcd.setCursor(0,0);
   lcd.print("G a m e  o v e r");
   lcd.setCursor(0,1);
   lcd.print("Score:  ");
   lcd.setCursor(8,1);
   lcd.print(score);
+  playLoseSound();
   while(1); // Game over, wait for reset
 }
 
 
 /**
- * @brief Start LCD and create custom characters
+ * @brief Check if colision happens with ship and alien's bullet
  * 
- */
-void setup()
-{
-  lcd.begin(16, 2);
-  lcd.createChar(SHIP, sprite::ship);
-  lcd.createChar(BULLET_UP, sprite::bullet_up);
-  lcd.createChar(BULLET_DOWN, sprite::bullet_down);
-  lcd.createChar(SHIP_BULLET, sprite::ship_bullet);
-  lcd.createChar(ALIEN1, sprite::alien1_1);
-  lcd.createChar(ALIEN2, sprite::alien1_2);
-  lcd.createChar(ALIEN1BULLET, sprite::alien1_1_bullet);
-  lcd.createChar(ALIEN2BULLET, sprite::alien1_2_bullet);
-  score = 0;
-  randomSeed(analogRead(1));
-  initLevel (1);
-}
-
-/**
- * @brief Check if colision happens
- * 
- * @param b alien bullet object
- * @param s ship object
+ * @param i alien bullet number
  * @return true if it happens
  */
-bool colide(const Bullet& b, const Ship& s)
+bool shipColide(byte i)
 {
-  return ( (b.x() == s.x()) && (b.y() == s.y()) )? true : false;
+  return ( (ship.x() == alienBullets[i].x()) && (ship.y() == alienBullets[i].y()) )? true : false;
 }
 
+
 /**
- * @brief Check if colision happens
+ * @brief Check if colision happens with alien and ship bullet
  * 
- * @param b ship bullet object
- * @param a alien object
+ * @param i number of alien
  * @return true if it happens
  */
-bool colide(const Bullet& b, const Alien& a)
+bool alienColide(byte i)
 {
-  return ( (b.x() == a.x()) && (b.y() == a.y()) )? true : false;
+  return ( (shipBullet.x() == aliens[i].x()) && (shipBullet.y() == aliens[i].y()) )? true : false;
 }
 
 
 /**
- * @brief Move all the objects and check for collisions
+ * @brief Ship interactions with aliens and bullets
  * 
  */
-void objects_Interactions()
+void shipActions()
 {
+  // Ship shoot
+  if(!shipBullet.active())
+  {
+    shipBullet.setX(ship.x());
+    shipBullet.setY(ship.y());
+    shipBullet.setSpeed(-1);
+    shipBullet.setActive(true);
+    tone(buzzerPin, 400,75);//play laser sound
+  }
+
   // Move the ship
   switch(buttonPressed())
   {
@@ -674,35 +762,49 @@ void objects_Interactions()
     default: break;
   }
 
-  if(shipBullet.active()) // Move ship bullet
+  // Move ship bullet
+  if(shipBullet.active())
     shipBullet.move();
+}
 
-  for (byte i = 0; i < ALIENS_NUM; i++) // Moving the aliens and their bullets
+
+/**
+ * @brief Aliens actions (move, shoot, etc.)
+ * 
+ */
+void alienActions()
+{
+  // Moving the aliens and their bullets
+  for (byte i = 0; i < ALIENS_NUM; i++)
   {
     if ( alienBullets[i].active() )
     {
       alienBullets[i].move();
 
-      if ( colide(alienBullets[i], ship) ) //Ship destruction
+      // Ship destruction
+      if ( shipColide(i) )
         gameOver();
     }
 
-    if (!(animationStep % alienStep)) // move alien only if it is on pace
+    // move alien only if it is on pace
+    if (!(animationStep % alienStep))
       aliens[i].move();
 
-    if ((colide(shipBullet, aliens[i])) &&
+    // Alien dies
+    if ((alienColide(i)) &&
         (shipBullet.active()) &&
         (aliens[i].alive()))
     {
-      aliens[i].setAlive(false);
       score += 10 * level;
-      aliensLeft--; // Alien dies
+      aliensLeft--;
+      tone(buzzerPin, 75,75);
     }
 
+    // Alien shoots
     if ( (!random(fireProbability))   &&
          (!alienBullets[i].active())  &&
          (aliens[i].alive()) )
-    { // Alien shoots
+    {
       alienBullets[i].setX(aliens[i].x());
       alienBullets[i].setY(aliens[i].y()+1);
       alienBullets[i].setSpeed(1);
@@ -710,7 +812,7 @@ void objects_Interactions()
     }
   }
 
-  // Changing the aliens'move direction
+  // Changing the alien's move direction
   if ( (!(animationStep % alienStep)) &&
        ((aliens[0].x() == 0) || (aliens[ALIENS_NUM - 1].x() == WIDTH - 1)) )
   {
@@ -720,26 +822,45 @@ void objects_Interactions()
 }
 
 
-/*Game loop*/
+/**
+ * @brief Start LCD and create custom characters
+ * 
+ */
+void setup()
+{
+  // init LCD
+  lcd.begin(16, 2);
+  // create custom characters
+  lcd.createChar(SHIP, sprite::ship);
+  lcd.createChar(BULLET_UP, sprite::bullet_up);
+  lcd.createChar(BULLET_DOWN, sprite::bullet_down);
+  lcd.createChar(SHIP_BULLET, sprite::ship_bullet);
+  lcd.createChar(ALIEN1, sprite::alien1_1);
+  lcd.createChar(ALIEN2, sprite::alien1_2);
+  lcd.createChar(ALIEN1BULLET, sprite::alien1_1_bullet);
+  lcd.createChar(ALIEN2BULLET, sprite::alien1_2_bullet);
+  // Set the buzzer pin to output mode
+  pinMode(buzzerPin, OUTPUT);
+  score = 0;
+  // seed to randomize the game
+  randomSeed(analogRead(1));
+  // Start the game
+  initLevel (1);
+}
+
+
+/**
+ * @brief Game main loop
+ * 
+ */
 void loop()
 {
-  // shoot
-  if(!shipBullet.active())
-  {
-    shipBullet.setX(ship.x());
-    shipBullet.setY(ship.y());
-    shipBullet.setSpeed(-1);
-    shipBullet.setActive(true);
-  }
-
-  objects_Interactions();
-
-  //Refresh screen
+  shipActions();
+  alienActions();
   updateScreen();
   animationStep++;
   delay (GAME_STEP);
-
-  //If no aliens left, starting next level
+  // If no aliens left, start next level
   if(!aliensLeft)
-    initLevel(level+1);
+    initLevel(level + 1);
 }
