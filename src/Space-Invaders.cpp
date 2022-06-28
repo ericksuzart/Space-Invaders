@@ -332,6 +332,18 @@ public:
 
 
 /**
+ * @brief Check if colision happens with ship and alien's bullet
+ * 
+ * @param i alien bullet number
+ * @return true if it happens
+ */
+bool shipColide(byte i)
+{
+  return ( (ship.x() == alienBullets[i].x()) && (ship.y() == alienBullets[i].y()) )? true : false;
+}
+
+
+/**
  * @brief Alien class, inherited from GameObject and has its own bullets (enemy)
  * 
  */
@@ -399,6 +411,18 @@ public:
   }
 
 } aliens[ALIENS_NUM];
+
+
+/**
+ * @brief Check if colision happens with alien and ship bullet
+ * 
+ * @param i number of alien
+ * @return true if it happens
+ */
+bool alienColide(byte i)
+{
+  return ( (shipBullet.x() == aliens[i].x()) && (shipBullet.y() == aliens[i].y()) )? true : false;
+}
 
 
 /**
@@ -711,30 +735,6 @@ void gameOver()
   lcd.print(score);
   playLoseSound();
   while(1); // Game over, wait for reset
-}
-
-
-/**
- * @brief Check if colision happens with ship and alien's bullet
- * 
- * @param i alien bullet number
- * @return true if it happens
- */
-bool shipColide(byte i)
-{
-  return ( (ship.x() == alienBullets[i].x()) && (ship.y() == alienBullets[i].y()) )? true : false;
-}
-
-
-/**
- * @brief Check if colision happens with alien and ship bullet
- * 
- * @param i number of alien
- * @return true if it happens
- */
-bool alienColide(byte i)
-{
-  return ( (shipBullet.x() == aliens[i].x()) && (shipBullet.y() == aliens[i].y()) )? true : false;
 }
 
 
