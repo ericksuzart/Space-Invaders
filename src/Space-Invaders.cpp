@@ -282,7 +282,7 @@ public:
       _active = false;
       return false;
     }
-    else return true;
+    return true;
   }
 
 } shipBullet, alienBullets[ALIENS_NUM]; // bullet objects for ship and aliens
@@ -308,7 +308,7 @@ public:
       _x--;
       return false;
     }
-    else return true;
+    return true;
   }
 
 
@@ -325,7 +325,7 @@ public:
       _x++;
       return false;
     }
-    else return true;
+    return true;
   }
 
 } ship;
@@ -407,7 +407,7 @@ public:
       _x -= _speed;
       return false;
     }
-    else return true;
+    return true;
   }
 
 } aliens[ALIENS_NUM];
@@ -470,10 +470,11 @@ void drawShipBullet(bool& shipDisplayed)
       // if bullet is on the ship's position draw it with ship
       screenBuffer[shipBullet.y() / 2][shipBullet.x()] = SHIP_BULLET;
       shipDisplayed = true;
+      return;
     }
-    else
-      // Draw bullet on the screenBuffer (without ship)
-      screenBuffer[shipBullet.y() / 2][shipBullet.x()] = (shipBullet.y() % 2) ? BULLET_DOWN : BULLET_UP;
+
+    // Draw bullet on the screenBuffer (without ship)
+    screenBuffer[shipBullet.y() / 2][shipBullet.x()] = (shipBullet.y() % 2) ? BULLET_DOWN : BULLET_UP;
   }
 }
 
@@ -487,18 +488,29 @@ void drawAliens()
   // for each alien
   for (byte i = 0; i < ALIENS_NUM; i++)
   {
-    // if alien is alive draw it on the screenBuffer with correct model in
-    // function of its state
-    if(aliens[i].alive())
-      screenBuffer[aliens[i].y() / 2][aliens[i].x()] = (aliens[i].state())? ALIEN1 : ALIEN2;
-
+    // Alien colides with ship bullet
     if ((alienColide(i)) &&
       (shipBullet.active()) &&
       (aliens[i].alive()))
     {
       screenBuffer[aliens[i].y() / 2][aliens[i].x()] = '*';
       aliens[i].setAlive(false);
+      continue;
     }
+
+    // Alien align with ship-bullet
+    if ((aliens[i].x() == shipBullet.x()) &&
+        (shipBullet.y() == 1) &&
+        (aliens[i].alive()))
+    {
+      screenBuffer[shipBullet.y()/2][shipBullet.x()] = (aliens[i].state()) ? ALIEN1BULLET : ALIEN2BULLET;
+      continue;
+    }
+
+    // if alien is alive draw it on the screenBuffer with correct model in
+    // function of its state
+    if(aliens[i].alive())
+      screenBuffer[aliens[i].y() / 2][aliens[i].x()] = (aliens[i].state())? ALIEN1 : ALIEN2;
   }
 }
 
@@ -537,10 +549,10 @@ void drawAlienBullets(bool& bulletDisplayed, bool& shipDisplayed)
         {
           screenBuffer[alienBullets[i].y()/2][alienBullets[i].x()] = SHIP_BULLET;
           shipDisplayed = true;
+          continue;
         }
-        else
-          // otherwise draw bullet on the screenBuffer (without ship model)
-          screenBuffer[alienBullets[i].y()/2][alienBullets[i].x()] = (alienBullets[i].y()%2) ? BULLET_DOWN : BULLET_UP;
+        // otherwise draw bullet on the screenBuffer (without ship model)
+        screenBuffer[alienBullets[i].y()/2][alienBullets[i].x()] = (alienBullets[i].y()%2) ? BULLET_DOWN : BULLET_UP;
       }
     }
   }
@@ -806,7 +818,7 @@ void alienActions()
          (aliens[i].alive()) )
     {
       alienBullets[i].setX(aliens[i].x());
-      alienBullets[i].setY(aliens[i].y()+1);
+      alienBullets[i].setY(aliens[i].y() + 1);
       alienBullets[i].setSpeed(1);
       alienBullets[i].setActive(true);
     }
