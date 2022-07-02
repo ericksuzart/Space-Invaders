@@ -38,7 +38,7 @@ int adc_key_in = 0; // initialize to no button pressed
 #define ALIEN1BULLET  6
 #define ALIEN2BULLET  7
 
-#define GAME_STEP   200 // Delay (ms) between game steps
+#define GAME_STEP   250 // Delay (ms) between game steps
 #define ALIENS_NUM    8 // Number of aliens
 
 byte animationStep; // Number of game step
