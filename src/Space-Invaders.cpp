@@ -21,6 +21,7 @@ LiquidCrystal lcd(13, 12, 11, 10, 9, 8, 7, 6, 5, 4);
 #define btnNONE   0
 #define btnLEFT   1
 #define btnRIGHT  2
+#define btnFIRE   3
 int adc_key_in = 0; // initialize to no button pressed
 
 #define buzzerPin 3
@@ -435,8 +436,11 @@ byte buttonPressed()
 {
   adc_key_in = analogRead(A0);      // read analogue value
 
+  // this threshold is based on the used resistors, if you change them, you need
+  // to change it here
   if (adc_key_in < 10)  return btnLEFT;
   if (adc_key_in < 350)  return btnRIGHT;
+  if (adc_key_in < 700)  return btnFIRE;
 
   return btnNONE;
 }
@@ -767,6 +771,10 @@ void shipActions()
     tone(buzzerPin, 400,75); // play laser sound
   }
 
+  // this serial print is to see what is the buttons thresholds, may vary
+  // depending on the used resistors
+  Serial.print("adc_key_in: "); Serial.println(adc_key_in);
+
   // Move the ship
   switch(buttonPressed())
   {
@@ -844,6 +852,8 @@ void setup()
 {
   // init LCD
   lcd.begin(16, 2);
+  Serial.begin(9600);
+
   // create custom characters
   lcd.createChar(SHIP, sprite::ship);
   lcd.createChar(BULLET_UP, sprite::bullet_up);
