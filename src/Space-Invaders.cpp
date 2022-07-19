@@ -39,6 +39,7 @@ int adc_key_in = 0; // initialize to no button pressed
 #define ALIENS_NUM    8 // Number of aliens
 
 byte animationStep; // Number of game step
+#define ALIEN_BULLET_STEP 2 // Speed of alien bullets, more is slow
 
 char screenBuffer[HEIGHT / 2][WIDTH + 1]; // Characters to be displayed on the screen
 
@@ -786,8 +787,8 @@ void alienActions()
   // Moving the aliens and their bullets
   for (byte i = 0; i < ALIENS_NUM; i++)
   {
-    // move the Alien bullet with half of the speed of the player's bullet
-    if ( alienBullets[i].active() && !(animationStep % 2) )
+    // move the Alien bullet Slower than the ship bullet
+    if ( alienBullets[i].active() && !(animationStep % ALIEN_BULLET_STEP))
     {
       alienBullets[i].move();
 
