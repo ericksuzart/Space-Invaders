@@ -9,9 +9,6 @@
  * 
  */
 
-#include <Arduino.h>
-#include <Wire.h>
-
 #include <LiquidCrystal.h>
 
 // LiquidCrystal lcd(rs, enable, d0, d1, d2, d3, d4, d5, d6, d7)
@@ -789,7 +786,8 @@ void alienActions()
   // Moving the aliens and their bullets
   for (byte i = 0; i < ALIENS_NUM; i++)
   {
-    if ( alienBullets[i].active() )
+    // move the Alien bullet with half of the speed of the player's bullet
+    if ( alienBullets[i].active() && !(animationStep % 2) )
     {
       alienBullets[i].move();
 
