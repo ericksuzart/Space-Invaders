@@ -15,7 +15,7 @@
 #include <LiquidCrystal.h>
 
 // LiquidCrystal lcd(rs, enable, d0, d1, d2, d3, d4, d5, d6, d7)
-LiquidCrystal lcd(13, 12, 11, 10, 9, 8, 7, 6, 5, 4);
+LiquidCrystal lcd(8, 9, 0, 1, 2, 3, 4, 5, 6, 7);
 
 // define button constants
 #define btnNONE   0
@@ -24,7 +24,7 @@ LiquidCrystal lcd(13, 12, 11, 10, 9, 8, 7, 6, 5, 4);
 #define btnFIRE   3
 int adc_key_in = 0; // initialize to no button pressed
 
-#define buzzerPin 3
+#define buzzerPin 10
 
 #define WIDTH   16
 #define HEIGHT   4
