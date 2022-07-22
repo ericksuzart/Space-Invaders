@@ -438,9 +438,9 @@ byte buttonPressed()
 
   // this threshold is based on the used resistors, if you change them, you need
   // to change it here
-  if (adc_key_in < 10)  return btnLEFT;
-  if (adc_key_in < 350)  return btnRIGHT;
-  if (adc_key_in < 700)  return btnFIRE;
+  if (adc_key_in < 50)    return btnLEFT;
+  if (adc_key_in < 550)   return btnRIGHT;
+  if (adc_key_in < 800)   return btnFIRE;
 
   return btnNONE;
 }
@@ -761,16 +761,6 @@ void gameOver()
  */
 void shipActions()
 {
-  // Ship shoot
-  if(!shipBullet.active())
-  {
-    shipBullet.setX(ship.x());
-    shipBullet.setY(ship.y());
-    shipBullet.setSpeed(-1);
-    shipBullet.setActive(true);
-    tone(buzzerPin, 400,75); // play laser sound
-  }
-
   // this serial print is to see what is the buttons thresholds, may vary
   // depending on the used resistors
   Serial.print("adc_key_in: "); Serial.println(adc_key_in);
@@ -780,6 +770,20 @@ void shipActions()
   {
     case btnRIGHT: { ship.moveRight(); break; }
     case btnLEFT: { ship.moveLeft(); break; }
+
+    // Ship shoot
+    case btnFIRE:
+    {
+      if (!shipBullet.active())
+      {
+        shipBullet.setX(ship.x());
+        shipBullet.setY(ship.y());
+        shipBullet.setSpeed(-1);
+        shipBullet.setActive(true);
+        tone(buzzerPin, 400,75); // play laser sound
+      }
+      break;
+    }
     default: break;
   }
 
