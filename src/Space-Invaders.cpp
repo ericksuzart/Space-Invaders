@@ -751,7 +751,12 @@ void gameOver()
   lcd.setCursor(8,1);
   lcd.print(score);
   playLoseSound();
-  while(1); // Game over, wait for reset
+
+  // Game over, wait for a button press to restart the game
+  while(!buttonPressed())
+    delay(100);
+
+  initLevel(1);
 }
 
 
