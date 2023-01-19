@@ -21,5 +21,8 @@ screen.
 
 This project was implemented in C++ using the Arduino UNO as a microcontroller.
 
+https://user-images.githubusercontent.com/44096624/213449090-a6884c6b-8d14-4649-928d-1acbd82c2200.mp4
+
 The code is available in simulated environment at Tinkercad:
 [Space-Invaders](https://www.tinkercad.com/things/8VGYlNrX5pF)
+
